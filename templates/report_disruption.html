@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniSafe - Report Disruption</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    :root {
+        --primary: #6a1b9a;
+        --primary-light: #9c4dcc;
+        --primary-dark: #38006b;
+        --secondary: #e1bee7;
+        --text-on-primary: #ffffff;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --background: #f5f5f5;
+        --card-background: #ffffff;
+        --success: #4caf50;
+        --danger: #f44336;
+        --warning: #ff9800;
+        --info: #2196f3;
+    }
+    
+    body {
+        background-color: var(--background);
+        min-height: 100vh;
+    }
+    
+    .navbar {
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .navbar-brand {
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .navbar-menu {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .navbar-menu a {
+        color: var(--text-on-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 5px 0;
+    }
+    
+    .navbar-menu a:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        background: var(--text-on-primary);
+        bottom: 0;
+        left: 0;
+        transition: width 0.3s ease;
+    }
+    
+    .navbar-menu a:hover:after {
+        width: 100%;
+    }
+    
+    .navbar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text-on-primary);
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .user-menu {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 10px;
+        border: 2px solid var(--text-on-primary);
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: var(--card-background);
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        min-width: 180px;
+        display: none;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .user-dropdown.active {
+        display: block;
+    }
+    
+    .user-dropdown a {
+        display: block;
+        padding: 10px 20px;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    
+    .user-dropdown a:hover {
+        background-color: var(--secondary);
+    }
+    
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .page-header {
+        margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+        font-size: 28px;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+    }
+    
+    .page-header p {
+        color: var(--text-secondary);
+        font-size: 16px;
+    }
+    
+    .report-card {
+        background-color: var(--card-background);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        animation: slideUp 0.5s ease;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease;
+        animation-fill-mode: both;
+    }
+    
+    .form-group:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+    
+    .form-group:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .form-group:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+    
+    .form-group:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+    
+    .form-group:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 2px 10px rgba(106, 27, 154, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .severity-options {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .severity-option {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .severity-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .severity-option input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .severity-option label {
+        display: block;
+        padding: 15px;
+        text-align: center;
+        background-color: #f9f9f9;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .severity-option input:checked + label {
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+        border-color: var(--primary);
+        box-shadow: 0 2px 10px rgba(106, 27, 154, 0.2);
+    }
+    
+    .severity-option.low input:checked + label {
+        background-color: var(--success);
+        border-color: var(--success);
+    }
+    
+    .severity-option.medium input:checked + label {
+        background-color: var(--warning);
+        border-color: var(--warning);
+    }
+    
+    .severity-option.high input:checked + label {
+        background-color: var(--danger);
+        border-color: var(--danger);
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary);
+        color: var(--text-on-primary);
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.5s ease;
+        animation-delay: 0.6s;
+        animation-fill-mode: both;
+    }
+    
+    .btn:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: 500;
+        animation: shake 0.5s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .alert-danger {
+        background-color: var(--danger);
+    }
+    
+    .alert-success {
+        background-color: var(--success);
+    }
+    
+    .alert-info {
+        background-color: var(--info);
+    }
+    
+    .file-input-container {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .file-input-container input[type=file] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    
+    .file-input-label {
+        display: block;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .file-input-container:hover .file-input-label {
+        background-color: #f0f0f0;
+        border-color: var(--primary-light);
+    }
+    
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .image-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+        border: 2px solid var(--primary-light);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .image-preview .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .image-preview .remove-image:hover {
+        background-color: var(--danger);
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .navbar-toggle {
+            display: block;
+        }
+        
+        .navbar-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: var(--primary);
+            flex-direction: column;
+            padding: 10px 20px;
+            z-index: 100;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.3s ease;
+        }
+        
+        .navbar-menu.active {
+            display: flex;
+        }
+        
+        .navbar-menu a:after {
+            display: none;
+        }
+        
+        .report-card {
+            padding: 20px;
+        }
+        
+        .severity-options {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        UniSafe
+    </div>
+    <button class="navbar-toggle" aria-label="Toggle navigation">
+        ☰
+    </button>
+    <div class="navbar-menu">
+        <a href="{{ url_for('index') }}">Dashboard</a>
+        <a href="{{ url_for('report_disruption') }}">Report Disruption</a>
+        <a href="{{ url_for('current_disruptions') }}">Current Disruptions</a>
+        <a href="{{ url_for('past_disruptions') }}">Past Disruptions</a>
+        {% if session.get('role') == 'admin' or session.get('role') == 'staff' %}
+        <a href="{{ url_for('verify_disruptions') }}">Verify Reports</a>
+        {% endif %}
+    </div>
+    <div class="user-menu">
+        <div class="user-avatar">
+            <img src="{{ url_for('static', filename=session.get('profile_picture', 'default_profile.png')) }}" alt="Profile">
+        </div>
+        <span>{{ session.get('username', 'User') }}</span>
+        <div class="user-dropdown">
+            <a href="{{ url_for('profile') }}">My Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="page-header">
+        <h1>Report a Disruption</h1>
+        <p>Help keep our campus safe by reporting any disruptions or security concerns</p>
+    </div>
+    
+    <div class="report-card">
+        <form action="{{ url_for('report_disruption') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter a brief title for the disruption" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-control" placeholder="Provide a detailed description of the disruption" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Specific Location</label>
+                <input type="text" id="location" name="location" class="form-control" placeholder="Enter the specific location (e.g., Building A, Room 101)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="campus_id">Campus</label>
+                <select id="campus_id" name="campus_id" class="form-control" required>
+                    <option value="" disabled selected>Select a campus</option>
+                    {% for campus in campuses %}
+                    <option value="{{ campus.id }}">{{ campus.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Severity Level</label>
+                <div class="severity-options">
+                    <div class="severity-option low">
+                        <input type="radio" id="low" name="severity" value="low" required>
+                        <label for="low">Low</label>
+                    </div>
+                    <div class="severity-option medium">
+                        <input type="radio" id="medium" name="severity" value="medium">
+                        <label for="medium">Medium</label>
+                    </div>
+                    <div class="severity-option high">
+                        <input type="radio" id="high" name="severity" value="high">
+                        <label for="high">High</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="images">Upload Images (Max 5)</label>
+                <div class="file-input-container">
+                    <input type="file" id="images" name="images" accept=".jpg,.jpeg,.png" multiple>
+                    <div class="file-input-label">Choose files</div>
+                </div>
+                <div class="image-preview-container" id="imagePreviewContainer"></div>
+                <small style="display: block; margin-top: 5px; color: var(--text-secondary);">You can upload up to 5 images to help document the disruption.</small>
+            </div>
+            
+            <button type="submit" class="btn">Submit Report</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const navbarToggle = document.querySelector('.navbar-toggle');
+        const navbarMenu = document.querySelector('.navbar-menu');
+        
+        if (navbarToggle) {
+            navbarToggle.addEventListener('click', function() {
+                navbarMenu.classList.toggle('active');
+            });
+        }
+        
+        // User dropdown toggle
+        const userMenu = document.querySelector('.user-menu');
+        const userDropdown = document.querySelector('.user-dropdown');
+        
+        if (userMenu) {
+            userMenu.addEventListener('click', function(e) {
+                userDropdown.classList.toggle('active');
+                e.stopPropagation();
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+        }
+        
+        // Image upload preview
+        const imageInput = document.getElementById('images');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const fileInputLabel = document.querySelector('.file-input-label');
+        const maxImages = 5;
+        let selectedFiles = [];
+        
+        imageInput.addEventListener('change', function() {
+            // Clear preview if user selects new files
+            if (this.files.length > 0) {
+                // Add new files to the selected files array (up to max)
+                const newFiles = Array.from(this.files).slice(0, maxImages - selectedFiles.length);
+                selectedFiles = selectedFiles.concat(newFiles);
+                
+                // Update file input label
+                fileInputLabel.textContent = `${selectedFiles.length} file(s) selected`;
+                
+                // Clear preview container
+                previewContainer.innerHTML = '';
+                
+                // Create preview for each selected file
+                selectedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'image-preview';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-image';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.dataset.index = index;
+                        
+                        removeBtn.addEventListener('click', function() {
+                            // Remove this file from the selected files array
+                            selectedFiles.splice(this.dataset.index, 1);
+                            
+                            // Update file input label
+                            fileInputLabel.textContent = selectedFiles.length > 0 
+                                ? `${selectedFiles.length} file(s) selected` 
+                                : 'Choose files';
+                            
+                            // Rebuild the preview
+                            previewContainer.innerHTML = '';
+                            selectedFiles.forEach((file, idx) => {
+                                const reader = new FileReader();
+                                
+                                reader.onload = function(e) {
+                                    const previewDiv = document.createElement('div');
+                                    previewDiv.className = 'image-preview';
+                                    
+                                    const img = document.createElement('img');
+                                    img.src = e.target.result;
+                                    
+                                    const removeBtn = document.createElement('div');
+                                    removeBtn.className = 'remove-image';
+                                    removeBtn.innerHTML = '×';
+                                    removeBtn.dataset.index = idx;
+                                    
+                                    removeBtn.addEventListener('click', function() {
+                                        selectedFiles.splice(this.dataset.index, 1);
+                                        previewContainer.removeChild(previewDiv);
+                                        fileInputLabel.textContent = selectedFiles.length > 0 
+                                            ? `${selectedFiles.length} file(s) selected` 
+                                            : 'Choose files';
+                                    });
+                                    
+                                    previewDiv.appendChild(img);
+                                    previewDiv.appendChild(removeBtn);
+                                    previewContainer.appendChild(previewDiv);
+                                };
+                                
+                                reader.readAsDataURL(file);
+                            });
+                        });
+                        
+                        previewDiv.appendChild(img);
+                        previewDiv.appendChild(removeBtn);
+                        previewContainer.appendChild(previewDiv);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                });
+                
+                // Disable file input if max images reached
+                if (selectedFiles.length >= maxImages) {
+                    imageInput.disabled = true;
+                    fileInputLabel.textContent = `Maximum ${maxImages} images selected`;
+                    fileInputLabel.style.backgroundColor = '#f0f0f0';
+                } else {
+                    imageInput.disabled = false;
+                    fileInputLabel.style.backgroundColor = '';
+                }
+            }
+        });
+        
+        // Hide alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        if (alerts.length > 0) {
+            setTimeout(function() {
+                alerts.forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(function() {
+                        alert.style.display = 'none';
+                    }, 500);
+                });
+            }, 5000);
+        }
+    });
+</script>
+</body>
+</html>
+

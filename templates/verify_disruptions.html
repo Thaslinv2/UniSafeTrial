@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniSafe - Verify Disruptions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6a1b9a;
+            --primary-light: #9c4dcc;
+            --primary-dark: #38006b;
+            --secondary: #e1bee7;
+            --text-on-primary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --background: #f5f5f5;
+            --card-background: #ffffff;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
+        body {
+            background-color: var(--background);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--primary);
+            color: var(--text-on-primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand svg {
+            margin-right: 10px;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        .navbar-menu a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: white;
+            bottom: 0;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-menu a:hover {
+            opacity: 1;
+        }
+        
+        .navbar-menu a:hover:after {
+            width: 100%;
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            animation: slideDown 0.5s ease;
+        }
+        
+        .page-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .disruption-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .disruption-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideUp 0.5s ease;
+            animation-fill-mode: both;
+        }
+        
+        .disruption-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+        
+        .disruption-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .disruption-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+        
+        .disruption-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+        
+        .disruption-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .disruption-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .disruption-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .disruption-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .disruption-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .disruption-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .disruption-body {
+            padding: 20px;
+        }
+        
+        .disruption-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .disruption-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .disruption-severity {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .severity-low {
+            background-color: #28a745;
+        }
+        
+        .severity-medium {
+            background-color: #ffc107;
+            color: #333;
+        }
+        
+        .severity-high {
+            background-color: #dc3545;
+        }
+        
+        .verification-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--primary);
+            color: var(--text-on-primary);
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .empty-list {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            color: #666;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            animation: slideDown 0.5s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert-danger {
+            background-color: #dc3545;
+        }
+        
+        .alert-success {
+            background-color: #28a745;
+        }
+        
+        .alert-info {
+            background-color: #17a2b8;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .disruption-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar-toggle {
+                display: block;
+            }
+            
+            .navbar-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 10px 20px;
+                z-index: 100;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                animation: slideDown 0.3s ease;
+            }
+            
+            .navbar-menu.active {
+                display: flex;
+            }
+            
+            .navbar-menu a:after {
+                display: none;
+            }
+            
+            .verification-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .verification-actions .btn {
+                width: 100%;
+                margin-bottom: 5px;
+                text-align: center;
+            }
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            UniSafe
+        </div>
+        <button class="navbar-toggle" aria-label="Toggle navigation">
+            ☰
+        </button>
+        <div class="navbar-menu">
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('report_disruption') }}">Report Disruption</a>
+            <a href="{{ url_for('current_disruptions') }}">Current Disruptions</a>
+            <a href="{{ url_for('past_disruptions') }}">Past Disruptions</a>
+            {% if session.get('role') == 'admin' or session.get('role') == 'staff' %}
+            <a href="{{ url_for('verify_disruptions') }}">Verify Reports</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+            <div class="user-avatar">
+                <img src="{{ url_for('static', filename=session.get('profile_picture', 'default_profile.png')) }}" alt="Profile" onerror="this.src='{{ url_for('static', filename='default_profile.png') }}'">
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="page-header">
+            <h1>Verify Disruptions</h1>
+            <p>Review and verify reported disruptions</p>
+        </div>
+        
+        {% if disruptions %}
+        <div class="disruption-grid">
+            {% for disruption in disruptions %}
+            <div class="disruption-card">
+                <div class="disruption-header">
+                    <div class="disruption-title">{{ disruption.title }}</div>
+                    <div class="disruption-meta">
+                        <span class="disruption-location">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            </svg>
+                            {{ disruption.location }}
+                        </span>
+                        <span class="disruption-time">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                            </svg>
+                            {{ disruption.created_at.strftime('%d %b %Y, %H:%M') }}
+                        </span>
+                    </div>
+                </div>
+                <div class="disruption-body">
+                    <div class="disruption-description">{{ disruption.description }}</div>
+                    <div>
+                        <strong>Reported by:</strong> {{ disruption.reporter.username }}
+                    </div>
+                </div>
+                <div class="disruption-footer">
+                    <span class="disruption-severity severity-{{ disruption.severity }}">{{ disruption.severity.capitalize() }}</span>
+                    <div class="verification-actions">
+                        <a href="{{ url_for('view_disruption', disruption_id=disruption.id) }}" class="btn">View Details</a>
+                        {% if disruption.status == 'pending' %}
+                        <form action="{{ url_for('verify_disruption', disruption_id=disruption.id) }}" method="post" style="display: inline;">
+                            <input type="hidden" name="action" value="verify">
+                            <button type="submit" class="btn btn-success">Verify</button>
+                        </form>
+                        <form action="{{ url_for('verify_disruption', disruption_id=disruption.id) }}" method="post" style="display: inline;">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                        {% elif disruption.status == 'verified' %}
+                        <form action="{{ url_for('verify_disruption', disruption_id=disruption.id) }}" method="post" style="display: inline;">
+                            <input type="hidden" name="action" value="resolve">
+                            <button type="submit" class="btn btn-success">Mark as Resolved</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-list">
+            <p>No disruptions to verify</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Add mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarToggle = document.querySelector('.navbar-toggle');
+            const navbarMenu = document.querySelector('.navbar-menu');
+            
+            if (navbarToggle) {
+                navbarToggle.addEventListener('click', function() {
+                    navbarMenu.classList.toggle('active');
+                });
+            }
+            
+            // Hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                setTimeout(function() {
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        alert.style.transition = 'opacity 0.5s ease';
+                        setTimeout(function() {
+                            alert.style.display = 'none';
+                        }, 500);
+                    });
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
+

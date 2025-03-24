@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniSafe - Login</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      :root {
+          --primary: #6a1b9a;
+          --primary-light: #9c4dcc;
+          --primary-dark: #38006b;
+          --secondary: #e1bee7;
+          --text-on-primary: #ffffff;
+          --text-primary: #333333;
+          --text-secondary: #666666;
+          --background: #f5f5f5;
+          --card-background: #ffffff;
+          --success: #4caf50;
+          --danger: #f44336;
+          --warning: #ff9800;
+          --info: #2196f3;
+      }
+      
+      body {
+          background: linear-gradient(135deg, #6a1b9a 0%, #9c4dcc 100%);
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+      }
+      
+      .login-container {
+          width: 100%;
+          max-width: 400px;
+          animation: fadeIn 0.5s ease-in-out;
+      }
+
+      /* Add a new container for the login form with background image */
+      .login-wrapper {
+          width: 100%;
+          max-width: 900px;
+          display: flex;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          background-color: var(--card-background);
+          animation: fadeIn 0.5s ease-in-out;
+      }
+
+      .login-image {
+          flex: 1;
+          background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+          background-size: cover;
+          background-position: center;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          padding: 30px;
+          color: white;
+      }
+
+      .login-image::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(to top, rgba(106, 27, 154, 0.8), rgba(106, 27, 154, 0.4));
+      }
+
+      .login-image-content {
+          position: relative;
+          z-index: 1;
+      }
+
+      .login-image h2 {
+          font-size: 28px;
+          margin-bottom: 10px;
+          font-weight: 600;
+      }
+
+      .login-image p {
+          font-size: 16px;
+          opacity: 0.9;
+      }
+
+      .login-form {
+          flex: 1;
+          padding: 40px;
+      }
+      
+      .login-header {
+          text-align: center;
+          margin-bottom: 30px;
+          animation: slideDown 0.5s ease;
+      }
+      
+      .login-header h1 {
+          font-size: 28px;
+          color: var(--primary);
+          margin-bottom: 10px;
+      }
+      
+      .login-header p {
+          color: var(--text-secondary);
+          font-size: 16px;
+      }
+      
+      .login-logo {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 20px;
+          animation: pulse 2s infinite;
+      }
+      
+      .login-logo svg {
+          width: 60px;
+          height: 60px;
+          color: var(--primary);
+      }
+      
+      .login-card {
+          background-color: var(--card-background);
+          border-radius: 10px;
+          padding: 30px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          animation: slideUp 0.5s ease;
+      }
+      
+      .form-group {
+          margin-bottom: 20px;
+          animation: fadeIn 0.5s ease;
+          animation-fill-mode: both;
+      }
+      
+      .form-group:nth-child(1) {
+          animation-delay: 0.1s;
+      }
+      
+      .form-group:nth-child(2) {
+          animation-delay: 0.2s;
+      }
+      
+      .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 14px;
+          color: var(--text-primary);
+          font-weight: 500;
+      }
+      
+      .form-control {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 14px;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      
+      .form-control:focus {
+          border-color: var(--primary);
+          outline: none;
+          box-shadow: 0 2px 10px rgba(106, 27, 154, 0.1);
+          transform: translateY(-2px);
+      }
+      
+      .btn {
+          display: block;
+          width: 100%;
+          padding: 12px;
+          background-color: var(--primary);
+          color: var(--text-on-primary);
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          animation: fadeIn 0.5s ease;
+          animation-delay: 0.3s;
+          animation-fill-mode: both;
+      }
+      
+      .btn:hover {
+          background-color: var(--primary-dark);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .login-footer {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          animation: fadeIn 0.5s ease;
+          animation-delay: 0.4s;
+          animation-fill-mode: both;
+      }
+      
+      .login-footer a {
+          color: var(--primary);
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.3s ease;
+      }
+      
+      .login-footer a:hover {
+          color: var(--primary-dark);
+          text-decoration: underline;
+      }
+      
+      .alert {
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 5px;
+          color: white;
+          font-weight: 500;
+          animation: shake 0.5s ease;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .alert-danger {
+          background-color: var(--danger);
+      }
+      
+      .alert-success {
+          background-color: var(--success);
+      }
+      
+      .alert-info {
+          background-color: var(--info);
+      }
+      
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+          }
+          to {
+              opacity: 1;
+          }
+      }
+      
+      @keyframes slideUp {
+          from {
+              opacity: 0;
+              transform: translateY(20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @keyframes slideDown {
+          from {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @keyframes shake {
+          0%, 100% {
+              transform: translateX(0);
+          }
+          10%, 30%, 50%, 70%, 90% {
+              transform: translateX(-5px);
+          }
+          20%, 40%, 60%, 80% {
+              transform: translateX(5px);
+          }
+      }
+      
+      @keyframes pulse {
+          0% {
+              transform: scale(1);
+          }
+          50% {
+              transform: scale(1.05);
+          }
+          100% {
+              transform: scale(1);
+          }
+      }
+      
+      @media (max-width: 480px) {
+          .login-card {
+              padding: 20px;
+          }
+      }
+
+      .navbar {
+          display: none;
+      }
+
+      .navbar {
+          background-color: var(--card-background);
+          color: var(--text-primary);
+          padding: 15px 20px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #eee;
+      }
+
+      .navbar-brand {
+          display: flex;
+          align-items: center;
+          font-size: 1.2em;
+          font-weight: 600;
+      }
+
+      .navbar-brand svg {
+          width: 24px;
+          height: 24px;
+          margin-right: 10px;
+          color: var(--primary);
+      }
+  </style>
+</head>
+<body>
+<!-- Add the global styles include at the top of the file -->
+{% include 'global_styles.html' %}
+
+<!-- Add animation classes to elements -->
+<div class="login-wrapper">
+    <div class="login-image">
+        <div class="login-image-content slide-left">
+            <h2>Welcome to UniSafe</h2>
+            <p>Your campus security alert system for a safer educational environment</p>
+        </div>
+    </div>
+    <div class="login-form">
+        <div class="login-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} slide-down">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="login-header slide-down">
+                <div class="login-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h1>UniSafe</h1>
+                <p>Login to access the campus security alert system</p>
+            </div>
+            
+            <div class="login-card slide-up">
+                <form action="{{ url_for('login') }}" method="post">
+                    <div class="form-group stagger-item">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group stagger-item">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn stagger-item hover-scale">Login</button>
+                </form>
+            </div>
+            
+            <div class="login-footer slide-up">
+                Don't have an account? <a href="{{ url_for('register') }}" class="hover-scale">Register here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        if (alerts.length > 0) {
+            setTimeout(function() {
+                alerts.forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(function() {
+                        alert.style.display = 'none';
+                    }, 500);
+                });
+            }, 5000);
+        }
+    });
+</script>
+</body>
+</html>
+

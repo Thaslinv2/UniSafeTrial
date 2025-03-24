@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniSafe - Dashboard</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      :root {
+          --primary: #6a1b9a;
+          --primary-light: #9c4dcc;
+          --primary-dark: #38006b;
+          --secondary: #e1bee7;
+          --text-on-primary: #ffffff;
+          --text-primary: #333333;
+          --text-secondary: #666666;
+          --background: #f5f5f5;
+          --card-background: #ffffff;
+          --success: #4caf50;
+          --danger: #f44336;
+          --warning: #ff9800;
+          --info: #2196f3;
+      }
+      
+      body {
+          background-color: var(--background);
+          min-height: 100vh;
+      }
+      
+      .navbar {
+          background-color: var(--primary);
+          color: var(--text-on-primary);
+          padding: 15px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          transition: all 0.3s ease;
+      }
+      
+      .navbar-brand {
+          font-size: 20px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+      }
+      
+      .navbar-brand svg {
+          margin-right: 10px;
+      }
+      
+      .navbar-menu {
+          display: flex;
+          gap: 20px;
+      }
+      
+      .navbar-menu a {
+          color: var(--text-on-primary);
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          position: relative;
+          padding: 5px 0;
+      }
+      
+      .navbar-menu a:after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 2px;
+          background: var(--text-on-primary);
+          bottom: 0;
+          left: 0;
+          transition: width 0.3s ease;
+      }
+      
+      .navbar-menu a:hover {
+          opacity: 1;
+      }
+      
+      .navbar-menu a:hover:after {
+          width: 100%;
+      }
+      
+      .navbar-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: var(--text-on-primary);
+          font-size: 24px;
+          cursor: pointer;
+      }
+      
+      .user-menu {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+      }
+      
+      .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          overflow: hidden;
+          margin-right: 10px;
+          border: 2px solid var(--text-on-primary);
+      }
+      
+      .user-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+      
+      .user-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background-color: var(--card-background);
+          border-radius: 5px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          padding: 10px 0;
+          min-width: 180px;
+          display: none;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease;
+      }
+      
+      .user-dropdown.active {
+          display: block;
+      }
+      
+      .user-dropdown a {
+          display: block;
+          padding: 10px 20px;
+          color: var(--text-primary);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+      }
+      
+      .user-dropdown a:hover {
+          background-color: var(--secondary);
+      }
+      
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px;
+          animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .dashboard-header {
+          margin-bottom: 30px;
+      }
+      
+      .dashboard-header h1 {
+          font-size: 28px;
+          color: var(--text-primary);
+          margin-bottom: 10px;
+      }
+      
+      .dashboard-header p {
+          color: var(--text-secondary);
+          font-size: 16px;
+      }
+      
+      .dashboard-stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin-bottom: 30px;
+      }
+      
+      .stat-card {
+          background-color: var(--card-background);
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          text-align: center;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          animation: slideUp 0.5s ease-in-out;
+          animation-fill-mode: both;
+      }
+      
+      .stat-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      
+      .stat-card:nth-child(1) {
+          animation-delay: 0.1s;
+      }
+      
+      .stat-card:nth-child(2) {
+          animation-delay: 0.2s;
+      }
+      
+      .stat-card:nth-child(3) {
+          animation-delay: 0.3s;
+      }
+      
+      .stat-card h2 {
+          font-size: 36px;
+          color: var(--primary);
+          margin-bottom: 10px;
+      }
+      
+      .stat-card p {
+          color: var(--text-secondary);
+          font-size: 14px;
+          font-weight: 500;
+      }
+      
+      .dashboard-actions {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+          margin-bottom: 30px;
+      }
+      
+      .action-card {
+          background-color: var(--card-background);
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          animation: slideUp 0.5s ease-in-out;
+          animation-fill-mode: both;
+      }
+      
+      .action-card:nth-child(1) {
+          animation-delay: 0.4s;
+      }
+      
+      .action-card:nth-child(2) {
+          animation-delay: 0.5s;
+      }
+      
+      .action-card:nth-child(3) {
+          animation-delay: 0.6s;
+      }
+      
+      .action-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      
+      .action-card h3 {
+          font-size: 18px;
+          color: var(--text-primary);
+          margin-bottom: 15px;
+      }
+      
+      .action-card p {
+          color: var(--text-secondary);
+          font-size: 14px;
+          margin-bottom: 20px;
+          line-height: 1.6;
+      }
+      
+      .btn {
+          display: inline-block;
+          padding: 10px 20px;
+          background-color: var(--primary);
+          color: var(--text-on-primary);
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      
+      .btn:hover {
+          background-color: var(--primary-dark);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .alert {
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 5px;
+          color: white;
+          font-weight: 500;
+          animation: slideDown 0.5s ease;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .alert-danger {
+          background-color: var(--danger);
+      }
+      
+      .alert-success {
+          background-color: var(--success);
+      }
+      
+      .alert-info {
+          background-color: var(--info);
+      }
+      
+      .recent-disruptions {
+          background-color: var(--card-background);
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          animation: slideUp 0.5s ease-in-out;
+          animation-delay: 0.7s;
+          animation-fill-mode: both;
+      }
+      
+      .recent-disruptions h3 {
+          font-size: 18px;
+          color: var(--text-primary);
+          margin-bottom: 15px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
+      }
+      
+      .disruption-list {
+          list-style: none;
+      }
+      
+      .disruption-item {
+          border-bottom: 1px solid #eee;
+          padding: 15px 0;
+          transition: background-color 0.3s ease;
+      }
+      
+      .disruption-item:hover {
+          background-color: #f9f9f9;
+      }
+      
+      .disruption-item:last-child {
+          border-bottom: none;
+      }
+      
+      .disruption-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 5px;
+          transition: color 0.3s ease;
+      }
+      
+      .disruption-title a:hover {
+          color: var(--primary);
+      }
+      
+      .disruption-meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+          color: var(--text-secondary);
+      }
+      
+      .disruption-location {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+      }
+      
+      .disruption-time {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+      }
+      
+      .disruption-severity {
+          display: inline-block;
+          padding: 3px 8px;
+          border-radius: 3px;
+          font-size: 12px;
+          font-weight: 500;
+          color: white;
+      }
+      
+      .severity-low {
+          background-color: var(--success);
+      }
+      
+      .severity-medium {
+          background-color: var(--warning);
+          color: #333;
+      }
+      
+      .severity-high {
+          background-color: var(--danger);
+      }
+      
+      .empty-list {
+          text-align: center;
+          padding: 20px;
+          color: var(--text-secondary);
+      }
+      
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+          }
+          to {
+              opacity: 1;
+          }
+      }
+      
+      @keyframes slideUp {
+          from {
+              opacity: 0;
+              transform: translateY(20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @keyframes slideDown {
+          from {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @media (max-width: 768px) {
+          .dashboard-stats,
+          .dashboard-actions {
+              grid-template-columns: 1fr;
+          }
+          
+          .navbar-toggle {
+              display: block;
+          }
+          
+          .navbar-menu {
+              display: none;
+              position: absolute;
+              top: 60px;
+              left: 0;
+              right: 0;
+              background-color: var(--primary);
+              flex-direction: column;
+              padding: 10px 20px;
+              z-index: 100;
+              box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+              animation: slideDown 0.3s ease;
+          }
+          
+          .navbar-menu.active {
+              display: flex;
+          }
+          
+          .navbar-menu a:after {
+              display: none;
+          }
+          
+          .disruption-meta {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 5px;
+          }
+      }
+  </style>
+    <!-- Add the logout modal include at the top of the file -->
+    {% include 'logout_modal.html' %}
+    {% include 'global_styles.html' %}
+</head>
+<body>
+  <nav class="navbar">
+      <div class="navbar-brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          UniSafe
+      </div>
+      <button class="navbar-toggle" aria-label="Toggle navigation">
+          ☰
+      </button>
+      <div class="navbar-menu">
+          <a href="{{ url_for('index') }}">Dashboard</a>
+          <a href="{{ url_for('report_disruption') }}">Report Disruption</a>
+          <a href="{{ url_for('current_disruptions') }}">Current Disruptions</a>
+          <a href="{{ url_for('past_disruptions') }}">Past Disruptions</a>
+          {% if session.get('role') == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}">Admin Panel</a>
+          {% endif %}
+          {% if session.get('role') == 'security' %}
+          <a href="{{ url_for('security_dashboard') }}">Security Dashboard</a>
+          {% endif %}
+      </div>
+      <div class="user-menu">
+          <div class="user-avatar">
+              <img src="{{ url_for('static', filename=session.get('profile_picture', 'default_profile.png')) }}" alt="Profile" onerror="this.src='{{ url_for('static', filename='default_profile.png') }}'">
+          </div>
+          <span>{{ session.get('username', 'User') }}</span>
+          <!-- Update the user dropdown to use the logout modal -->
+          <div class="user-dropdown">
+              <a href="{{ url_for('profile') }}">My Profile</a>
+              <a href="javascript:void(0)" onclick="openLogoutModal()">Logout</a>
+          </div>
+      </div>
+  </nav>
+
+  <!-- Add a check for the user variable -->
+  {% if user %}
+  <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">
+                      {{ message }}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      
+      <!-- Add animation classes to elements -->
+      <div class="dashboard-header slide-down">
+          <h1>Welcome, {{ session.get('username', 'User') }}</h1>
+          <p>Stay informed about campus security disruptions</p>
+      </div>
+      
+      <div class="dashboard-stats">
+          <div class="stat-card stagger-item hover-lift">
+              <h2>{{ active_count }}</h2>
+              <p>Active Disruptions</p>
+          </div>
+          <div class="stat-card stagger-item hover-lift">
+              <h2>{{ resolved_count }}</h2>
+              <p>Resolved Disruptions</p>
+          </div>
+          <div class="stat-card stagger-item hover-lift">
+              <h2>{{ total_count }}</h2>
+              <p>Total Reports</p>
+          </div>
+      </div>
+      
+      <div class="dashboard-actions">
+          <div class="action-card stagger-item hover-lift">
+              <h3>Report a Disruption</h3>
+              <p>Witnessed a security incident or disruption on campus? Report it here to help keep everyone informed and safe.</p>
+              <a href="{{ url_for('report_disruption') }}" class="btn">Report Now</a>
+          </div>
+          <div class="action-card stagger-item hover-lift">
+              <h3>View Current Disruptions</h3>
+              <p>Stay updated on ongoing security incidents and disruptions happening on campus right now.</p>
+              <a href="{{ url_for('current_disruptions') }}" class="btn">View Current</a>
+          </div>
+          <div class="action-card stagger-item hover-lift">
+              <h3>View Past Disruptions</h3>
+              <p>Browse through the history of past security incidents and disruptions for awareness and learning.</p>
+              <a href="{{ url_for('past_disruptions') }}" class="btn">View History</a>
+          </div>
+      </div>
+      
+      <div class="recent-disruptions slide-up">
+          <h3>Recent Disruptions</h3>
+          {% if recent_disruptions %}
+          <ul class="disruption-list">
+              {% for disruption in recent_disruptions %}
+              <li class="disruption-item stagger-item">
+                  <div class="disruption-title">
+                      <a href="{{ url_for('view_disruption', disruption_id=disruption.id) }}" style="color: inherit; text-decoration: none;">
+                          {{ disruption.title }}
+                      </a>
+                  </div>
+                  <div class="disruption-meta">
+                      <span class="disruption-location">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                              <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                          </svg>
+                          {{ disruption.location }} ({{ disruption.campus.name }})
+                      </span>
+                      <span class="disruption-severity severity-{{ disruption.severity }}">{{ disruption.severity.capitalize() }}</span>
+                      <span class="disruption-time">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                          </svg>
+                          {{ disruption.created_at.strftime('%d %b %Y, %H:%M') }}
+                      </span>
+                  </div>
+              </li>
+              {% endfor %}
+          </ul>
+          {% else %}
+          <div class="empty-list">No recent disruptions to display</div>
+          {% endif %}
+      </div>
+  </div>
+  {% else %}
+  <div class="container">
+      <div class="alert alert-danger">
+          User information could not be loaded. Please try logging in again.
+      </div>
+      <div class="text-center mt-4">
+          <a href="{{ url_for('logout') }}" class="btn">Return to Login</a>
+      </div>
+  </div>
+  {% endif %}
+
+  <script>
+      // Add mobile menu toggle functionality
+      document.addEventListener('DOMContentLoaded', function() {
+          const navbarToggle = document.querySelector('.navbar-toggle');
+          const navbarMenu = document.querySelector('.navbar-menu');
+          
+          if (navbarToggle) {
+              navbarToggle.addEventListener('click', function() {
+                  navbarMenu.classList.toggle('active');
+              });
+          }
+          
+          // User dropdown toggle
+          const userMenu = document.querySelector('.user-menu');
+          const userDropdown = document.querySelector('.user-dropdown');
+          
+          if (userMenu) {
+              userMenu.addEventListener('click', function(e) {
+                  userDropdown.classList.toggle('active');
+                  e.stopPropagation();
+              });
+              
+              // Close dropdown when clicking outside
+              document.addEventListener('click', function() {
+                  userDropdown.classList.remove('active');
+              });
+          }
+          
+          // Hide alerts after 5 seconds
+          const alerts = document.querySelectorAll('.alert');
+          if (alerts.length > 0) {
+              setTimeout(function() {
+                  alerts.forEach(alert => {
+                      alert.style.opacity = '0';
+                      alert.style.transition = 'opacity 0.5s ease';
+                      setTimeout(function() {
+                          alert.style.display = 'none';
+                      }, 500);
+                  });
+              }, 5000);
+          }
+      });
+  </script>
+</body>
+</html>
+

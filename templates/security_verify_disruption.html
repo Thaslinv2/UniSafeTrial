@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniSafe - Verify Disruption</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6a1b9a;
+            --primary-light: #9c4dcc;
+            --primary-dark: #38006b;
+            --secondary: #e1bee7;
+            --text-on-primary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --background: #f5f5f5;
+            --card-background: #ffffff;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
+        body {
+            background-color: var(--background);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--primary);
+            color: var(--text-on-primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            opacity: 0.8;
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            font-size: 28px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        .disruption-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .disruption-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .disruption-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .disruption-severity {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .severity-low {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .severity-medium {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .severity-high {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .disruption-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-group {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .disruption-description {
+            margin-bottom: 20px;
+        }
+        
+        .description-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .description-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        
+        .disruption-images {
+            margin-bottom: 30px;
+        }
+        
+        .images-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .disruption-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .disruption-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .disruption-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .form-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: var(--text-on-primary);
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #3d8b40;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .alert-danger {
+            background-color: var(--danger);
+        }
+        
+        .alert-success {
+            background-color: var(--success);
+        }
+        
+        .alert-info {
+            background-color: var(--info);
+        }
+        
+        /* Image modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 50px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-toggle {
+                display: block;
+            }
+            
+            .navbar-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 10px 20px;
+                z-index: 100;
+            }
+            
+            .navbar-menu.active {
+                display: flex;
+            }
+            
+            .disruption-card, .form-card {
+                padding: 20px;
+            }
+            
+            .disruption-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .disruption-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            UniSafe
+        </div>
+        <button class="navbar-toggle" aria-label="Toggle navigation">
+            ☰
+        </button>
+        <div class="navbar-menu">
+            <a href="{{ url_for('security_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            <div class="user-avatar">
+                <img src="{{ url_for('static', filename=session.get('profile_picture', 'default_profile.png')) }}" alt="Profile">
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="page-header">
+            <h1>Verify Disruption</h1>
+            <p>Review and verify the disruption report</p>
+        </div>
+        
+        <div class="disruption-card">
+            <div class="disruption-header">
+                <div class="disruption-title">{{ disruption.title }}</div>
+                <div class="disruption-severity severity-{{ disruption.severity }}">{{ disruption.severity }}</div>
+            </div>
+            
+            <div class="disruption-details">
+                <div>
+                    <div class="detail-group">
+                        <div class="detail-label">Location</div>
+                        <div class="detail-value">{{ disruption.location }}</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Campus</div>
+                        <div class="detail-value">{{ disruption.campus.name }}</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="detail-group">
+                        <div class="detail-label">Reported By</div>
+                        <div class="detail-value">{{ disruption.reporter.first_name }} {{ disruption.reporter.last_name }}</div>
+                    </div>
+                    
+                    <div class="detail-group">
+                        <div class="detail-label">Reported On</div>
+                        <div class="detail-value">{{ disruption.created_at.strftime('%d %B %Y, %H:%M') }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="disruption-description">
+                <div class="description-label">Description</div>
+                <div class="description-text">{{ disruption.description }}</div>
+            </div>
+            
+            {% if disruption.images %}
+            <div class="disruption-images">
+                <div class="images-label">Images</div>
+                <div class="images-container">
+                    {% for image in disruption.images %}
+                    <div class="disruption-image" onclick="openModal('{{ url_for('static', filename='uploads/' + image.filename) }}')">
+                        <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="Disruption Image">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-card">
+            <form action="{{ url_for('security_verify_disruption', disruption_id=disruption.id) }}" method="post">
+                <div class="form-group">
+                    <label>Is this disruption valid?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="is_valid" value="yes" required> Yes
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="is_valid" value="no"> No
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="actual_location">Actual Location</label>
+                    <input type="text" id="actual_location" name="actual_location" class="form-control" value="{{ disruption.location }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="actual_severity">Actual Severity</label>
+                    <select id="actual_severity" name="actual_severity" class="form-control" required>
+                        <option value="low" {% if disruption.severity == 'low' %}selected{% endif %}>Low</option>
+                        <option value="medium" {% if disruption.severity == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="high" {% if disruption.severity == 'high' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="actions_taken">Actions Taken / Reason for Rejection</label>
+                    <textarea id="actions_taken" name="actions_taken" class="form-control" placeholder="Describe the actions taken to address this disruption or the reason for rejecting it" required></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{{ url_for('security_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Submit Verification</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <script>
+        // Add mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbarToggle = document.querySelector('.navbar-toggle');
+            const navbarMenu = document.querySelector('.navbar-menu');
+            
+            if (navbarToggle) {
+                navbarToggle.addEventListener('click', function() {
+                    navbarMenu.classList.toggle('active');
+                });
+            }
+        });
+        
+        // Image modal functionality
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            modalImg.src = imageSrc;
+            modal.classList.add('show');
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+        }
+        
+        // Close modal when clicking outside the image
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
+

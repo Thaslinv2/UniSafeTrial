@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniSafe - View Team</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      :root {
+          --primary: #6a1b9a;
+          --primary-light: #9c4dcc;
+          --primary-dark: #38006b;
+          --secondary: #e1bee7;
+          --text-on-primary: #ffffff;
+          --text-primary: #333333;
+          --text-secondary: #666666;
+          --background: #f5f5f5;
+          --card-background: #ffffff;
+          --success: #4caf50;
+          --danger: #f44336;
+          --warning: #ff9800;
+          --info: #2196f3;
+      }
+      
+      body {
+          background-color: var(--background);
+          min-height: 100vh;
+      }
+      
+      .navbar {
+          background-color: var(--primary);
+          color: var(--text-on-primary);
+          padding: 15px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+      }
+      
+      .navbar-brand {
+          font-size: 20px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+      
+      .navbar-menu {
+          display: flex;
+          gap: 20px;
+      }
+      
+      .navbar-menu a {
+          color: var(--text-on-primary);
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          position: relative;
+          padding: 5px 0;
+      }
+      
+      .navbar-menu a:after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 2px;
+          background: var(--text-on-primary);
+          bottom: 0;
+          left: 0;
+          transition: width 0.3s ease;
+      }
+      
+      .navbar-menu a:hover:after {
+          width: 100%;
+      }
+      
+      .navbar-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: var(--text-on-primary);
+          font-size: 24px;
+          cursor: pointer;
+      }
+      
+      .user-menu {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+      }
+      
+      .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          overflow: hidden;
+          margin-right: 10px;
+          border: 2px solid var(--text-on-primary);
+      }
+      
+      .user-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+      
+      .user-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background-color: var(--card-background);
+          border-radius: 5px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          padding: 10px 0;
+          min-width: 180px;
+          display: none;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease;
+      }
+      
+      .user-dropdown.active {
+          display: block;
+      }
+      
+      .user-dropdown a {
+          display: block;
+          padding: 10px 20px;
+          color: var(--text-primary);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+      }
+      
+      .user-dropdown a:hover {
+          background-color: var(--secondary);
+      }
+      
+      .container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+          animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      .page-header {
+          margin-bottom: 30px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      
+      .page-header h1 {
+          font-size: 28px;
+          color: var(--text-primary);
+      }
+      
+      .team-card {
+          background-color: var(--card-background);
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+          margin-bottom: 30px;
+          animation: slideUp 0.5s ease;
+      }
+      
+      .team-header {
+          padding: 20px;
+          border-bottom: 1px solid #eee;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      
+      .team-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--text-primary);
+      }
+      
+      .team-severity {
+          display: inline-block;
+          padding: 5px 10px;
+          border-radius: 3px;
+          font-size: 12px;
+          font-weight: 500;
+          color: white;
+      }
+      
+      .severity-low {
+          background-color: var(--success);
+      }
+      
+      .severity-medium {
+          background-color: var(--warning);
+          color: #333;
+      }
+      
+      .severity-high {
+          background-color: var(--danger);
+      }
+      
+      .team-body {
+          padding: 20px;
+      }
+      
+      .team-info {
+          margin-bottom: 20px;
+      }
+      
+      .info-item {
+          margin-bottom: 10px;
+      }
+      
+      .info-label {
+          font-weight: 500;
+          color: var(--text-primary);
+      }
+      
+      .info-value {
+          color: var(--text-secondary);
+      }
+      
+      .members-table-container {
+          margin-top: 20px;
+      }
+      
+      .members-table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+      
+      .members-table th,
+      .members-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #eee;
+      }
+      
+      .members-table th {
+          background-color: #f9f9f9;
+          font-weight: 600;
+          color: var(--text-primary);
+      }
+      
+      .members-table tr:hover {
+          background-color: #f9f9f9;
+      }
+      
+      .members-table tr:last-child td {
+          border-bottom: none;
+      }
+      
+      .member-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          overflow: hidden;
+      }
+      
+      .member-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+      
+      .member-actions {
+          display: flex;
+          gap: 5px;
+      }
+      
+      .btn {
+          display: inline-block;
+          padding: 8px 15px;
+          background-color: var(--primary);
+          color: var(--text-on-primary);
+          border: none;
+          border-radius: 5px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      
+      .btn:hover {
+          background-color: var(--primary-dark);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .btn-sm {
+          padding: 5px 10px;
+          font-size: 12px;
+      }
+      
+      .btn-secondary {
+          background-color: #6c757d;
+      }
+      
+      .btn-secondary:hover {
+          background-color: #5a6268;
+      }
+      
+      .btn-danger {
+          background-color: var(--danger);
+      }
+      
+      .btn-danger:hover {
+          background-color: #d32f2f;
+      }
+      
+      .alert {
+          padding: 15px;
+          margin-bottom: 20px;
+          border-radius: 5px;
+          color: white;
+          font-weight: 500;
+          animation: slideDown 0.5s ease;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .alert-danger {
+          background-color: var(--danger);
+      }
+      
+      .alert-success {
+          background-color: var(--success);
+      }
+      
+      .alert-info {
+          background-color: var(--info);
+      }
+      
+      .empty-state {
+          text-align: center;
+          padding: 30px;
+          color: var(--text-secondary);
+      }
+      
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+          }
+          to {
+              opacity: 1;
+          }
+      }
+      
+      @keyframes slideUp {
+          from {
+              opacity: 0;
+              transform: translateY(20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @keyframes slideDown {
+          from {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+      
+      @media (max-width: 768px) {
+          .navbar-toggle {
+              display: block;
+          }
+          
+          .navbar-menu {
+              display: none;
+              position: absolute;
+              top: 60px;
+              left: 0;
+              right: 0;
+              background-color: var(--primary);
+              flex-direction: column;
+              padding: 10px 20px;
+              z-index: 100;
+              box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+              animation: slideDown 0.3s ease;
+          }
+          
+          .navbar-menu.active {
+              display: flex;
+          }
+          
+          .navbar-menu a:after {
+              display: none;
+          }
+          
+          .page-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
+          }
+          
+          .members-table-container {
+              overflow-x: auto;
+          }
+          
+          .members-table th:nth-child(3),
+          .members-table td:nth-child(3) {
+              display: none;
+          }
+      }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+      <div class="navbar-brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          UniSafe Admin
+      </div>
+      <button class="navbar-toggle" aria-label="Toggle navigation">
+          ☰
+      </button>
+      <div class="navbar-menu">
+          <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('admin_users') }}">Manage Users</a>
+          <a href="{{ url_for('admin_security_teams') }}">Security Teams</a>
+          <a href="{{ url_for('index') }}">Main Site</a>
+      </div>
+      <div class="user-menu">
+          <div class="user-avatar">
+              <img src="{{ url_for('static', filename=session.get('profile_picture', 'default_profile.png')) }}" alt="Profile">
+          </div>
+          <span>{{ session.get('username', 'Admin') }}</span>
+          <div class="user-dropdown">
+              <a href="{{ url_for('profile') }}">My Profile</a>
+              <a href="{{ url_for('logout') }}">Logout</a>
+          </div>
+      </div>
+  </nav>
+  
+  <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">
+                      {{ message }}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}
+      
+      <div class="page-header">
+          <h1>{{ team.campus.name }} Security Team</h1>
+          <a href="{{ url_for('create_security_user') }}" class="btn">Add Team Member</a>
+      </div>
+      
+      <div class="team-card">
+          <div class="team-header">
+              <div class="team-title">Team Details</div>
+              <div class="team-severity severity-{{ team.severity_level }}">{{ team.severity_level.capitalize() }}</div>
+          </div>
+          <div class="team-body">
+              <div class="team-info">
+                  <div class="info-item">
+                      <span class="info-label">Campus:</span>
+                      <span class="info-value">{{ team.campus.name }}</span>
+                  </div>
+                  <div class="info-item">
+                      <span class="info-label">Severity Level:</span>
+                      <span class="info-value">{{ team.severity_level.capitalize() }}</span>
+                  </div>
+                  <div class="info-item">
+                      <span class="info-label">Team Size:</span>
+                      <span class="info-value">{{ team_members|length }} members</span>
+                  </div>
+              </div>
+              
+              <h3>Team Members</h3>
+              
+              {% if team_members %}
+              <div class="members-table-container">
+                  <table class="members-table">
+                      <thead>
+                          <tr>
+                              <th>Photo</th>
+                              <th>Name</th>
+                              <th>Email</th>
+                              <th>Contact</th>
+                              <th>Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for member in team_members %}
+                          <tr>
+                              <td>
+                                  <div class="member-avatar">
+                                      <img src="{{ url_for('static', filename='uploads/' + member.user.profile_picture) }}" alt="{{ member.user.username }}">
+                                  </div>
+                              </td>
+                              <td>{{ member.user.first_name }} {{ member.user.last_name }}</td>
+                              <td>{{ member.user.email }}</td>
+                              <td>{{ member.user.contact_number or 'N/A' }}</td>
+                              <td class="member-actions">
+                                  <a href="#" class="btn btn-sm">View</a>
+                                  <button class="btn btn-sm btn-danger" onclick="confirmRemove({{ member.id }}, '{{ member.user.first_name }} {{ member.user.last_name }}')">Remove</button>
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              {% else %}
+              <div class="empty-state">
+                  <p>No members assigned to this team yet.</p>
+              </div>
+              {% endif %}
+          </div>
+      </div>
+  </div>
+  
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Mobile menu toggle
+          const navbarToggle = document.querySelector('.navbar-toggle');
+          const navbarMenu = document.querySelector('.navbar-menu');
+          
+          if (navbarToggle) {
+              navbarToggle.addEventListener('click', function() {
+                  navbarMenu.classList.toggle('active');
+              });
+          }
+          
+          // User dropdown toggle
+          const userMenu = document.querySelector('.user-menu');
+          const userDropdown = document.querySelector('.user-dropdown');
+          
+          if (userMenu) {
+              userMenu.addEventListener('click', function(e) {
+                  userDropdown.classList.toggle('active');
+                  e.stopPropagation();
+              });
+              
+              // Close dropdown when clicking outside
+              document.addEventListener('click', function() {
+                  userDropdown.classList.remove('active');
+              });
+          }
+          
+          // Hide alerts after 5 seconds
+          const alerts = document.querySelectorAll('.alert');
+          if (alerts.length > 0) {
+              setTimeout(function() {
+                  alerts.forEach(alert => {
+                      alert.style.opacity = '0';
+                      alert.style.transition = 'opacity 0.5s ease';
+                      setTimeout(function() {
+                          alert.style.display = 'none';
+                      }, 500);
+                  });
+              }, 5000);
+          }
+      });
+      
+      function confirmRemove(memberId, memberName) {
+          if (confirm(`Are you sure you want to remove ${memberName} from this team?`)) {
+              // Here you would typically make an AJAX request to remove the member
+              // For now, we'll just redirect to a hypothetical remove endpoint
+              window.location.href = `/admin/remove-team-member/${memberId}`;
+          }
+      }
+  </script>
+</body>
+</html>
+
